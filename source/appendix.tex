@@ -1,0 +1,43 @@
+\section{Appendix}
+\label{sec:appendix}
+
+The following are the python scripts used to automate the tests
+
+\begin{lstlisting}[language=Python]
+import subprocess, time
+import numpy as np
+
+n_times = 10
+ip_address = "192.168.1.98" # May vary
+bitrates=[]
+print("\n")
+
+for i in range(n_times):
+	bitrate=subprocess.check_output(f"(iperf3 -c {ip_address} | grep receiver | tr -s ' ' | cut -d ' ' -f 7)",shell=True).decode().strip("\n") 
+        print(f"#{i+1} bitrate: {bitrate} Mbps")
+	bitrates.append(float(bitrate))
+	time.sleep(1)
+
+print("\n")
+
+min = round(np.min(bitrates),2)
+print(f"min: {min} Mbps")
+max = round(np.max(bitrates),2)
+print(f"max: {max} Mbps")
+avg = round(np.mean(bitrates),2)
+print(f"avg: {avg} Mbps")
+std = round(np.std(bitrates),2)
+print(f"std: {std} Mbps")
+
+print("\n")
+\end{lstlisting}
+\captionof{lstlisting}{Script for TCP tests}
+
+\vspace{0.5 cm}
+
+For UDP, the script is the same, with the difference in the iperf3 command, in which has been used:
+\begin{lstlisting}[language=bash]
+iperf3 -c {indirizzo_IP} -u -l 1472 -b 1G
+\end{lstlisting}
+
+\vspace{0.5 cm}

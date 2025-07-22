@@ -1,0 +1,39 @@
+\section{Tools and theory}
+\label{sec:tools_and_theory}
+
+\subsection{Tools}
+The tests have been performed using iperf3 (version 3.9)~\cite{iPerf}, a tool for network performance measurement that can calculate either TCP or UDP goodput. To conduct an iperf3 test, the user needs to set up both a server and a client. \\
+The main used options are:
+\begin{itemize}
+    \item \textbf{Server Mode} \texttt{-s}: Run iperf in server mode.
+    \item \textbf{Client Mode} \texttt{-c <IP\_server>}: Run iperf in client mode, connecting to an iperf server with the specified IP address.
+    \item \textbf{UDP Testing} \texttt{-u}: Use UDP rather than TCP.
+    \item \textbf{Bandwidth} \texttt{-b}: Set target bandwidth to n bits/sec.
+    \item \textbf{Buffer length} \texttt{-l}: The length of buffers to read or write.
+\end{itemize}
+For more details about the options visit the \href{www.iperf.fr/iperf-doc.php}{iPerf3 docs}.\\ 
+In the test performed with UDP, the following options were used:
+\begin{lstlisting}
+iperf3 -c {ip_address} -u -l 1472 -b 1G
+\end{lstlisting}
+In the case of UDP, iperf3 tries to dynamically determine an appropriate sending size. If it cannot be determined, it defaults to 1460. However, to optimize goodput, it should be set to $MTU-20-8$, which equals 1472, given MTU equals to 1500.
+In addition, the default bandwidth is 1 Mbps (in UDP case), however to not limit the throughput is better select 1 Gbps.
+Finally, Wireshark has been used to generate different plots in the different scenarios. For instance, the Round Trip Time plot can be useful to detect if congestion is arising, while the throughput plot shows the total number of bytes received within the Moving Average Window over the window duration, which shows the throughput consistency over time. 
+
+\subsection{Goodput estimation}
+Given the capacity C at the physical layer, the goodput G is defined as the speed at which useful data is received at the application layer. \[ G = \frac{\text{useful data}}{\text{transfer time}} = \eta_{Protocol} * C \]
+In order to calculate the goodput is needed the protocol efficiency that can be calculated in the following way (considering that MSS is the transport layer payload size, and $MSS = MTU - Headers (L3, L4) $ where MTU is 1500B and it's the commonly maximum IP datagram size): 
+\[ \eta_{Protocol} = \frac{\text{MSS}}{MSS+Header_{TCP/UDP}+Header_{IP}+Header_{Eth}} \]
+In the case of Ethernet the efficiencies for TCP and UDP protocols, respectively, are the following:
+\[ \eta_{TCP_{Eth}} =\frac{\text{1460}}{\text{1460+20+20+38}} = 94.9\%  \]
+\[ \eta_{UDP_{Eth}} = \frac{\text{1472}}{\text{1472+20+8+38}} = 95.7\%  \]
+When dealing with Wi-Fi, the situation becomes more complex: it is not possible to replace ${Header_{Eth}}$ size with ${Header_{WiFi}}$ size in formula above. It necessary to consider the 802.11 protocol particular overhead and the fact that Wi-Fi operates as a shared medium. Wi-Fi communications are half duplex, meaning data can only be transmitted in one direction at a time, and certain frames (control frames) must be sent at slower speeds (1 Mbps) to ensure protocol correctness, which introduces latency. The half duplex nature effectively splits the maximum throughput in half because the Wireless Access Point can either receive or transmit data but cannot do both simultaneously.
+However, newer Wireless Access Points (like the one used for this report) use protocols like 802.11ac or 802.11ax, which incorporate Multi-User Multiple Input Multiple Output (MU-MIMO) technology, which allow to reduce this unwanted overhead effect, allowing to reach in optimal conditions an efficiency of 80\% using TCP ~\cite{wiisfi}.
+MU-MIMO technology enhances Wi-Fi performance by enabling an AP to receive data from multiple devices simultaneously or transmit data to multiple devices simultaneously ~\cite{mu_mimo_cisco, mu_mimo_huawei}. However, it's important to note that MU-MIMO is not full duplex; rather, it leverages spatial direction antennas to increase bandwidth. To describe a wireless device, abbreviation AxB:C is often used, where A represents the number of Tx radio chains available to the device, B represents the number of Rx radio chains, and C represents the number of spatial streams. You need at least one radio chain to make use of one spatial stream, so C is usually omitted because in most cases it has the same number of A and B. Spatial streams exploit the difference in signal paths caused by the space between antennas. This multipath phenomenon, once problematic for wireless communication, now allows multiple streams of data to be transmitted simultaneously from different antennas. 
+MU-MIMO in 802.11ac works only in the downstream direction, so only allows multiple simultaneous communications from AP to client stations. Upstream MU-MIMO was introduced later in 802.11ax. 
+However, it's important to note that MU-MIMO signals are broadcast directionally. If two client devices are very close to each other, they would not benefit much from MU-MIMO. 
+So, given that \[ \eta_{TCP_{WiFi}} = \eta_{TCP+IP} * \eta_{WiFi} \hspace{0.2cm} \text{and}  \hspace{0.2cm} \eta_{TCP_{WiFi}} = 80\%  ~\cite{wiisfi}\] follows that \[\eta_{WiFi} = 0.80 * \frac{\text{1460+20+20}}{\text{1460}} = 82.2 \% \]
+therefore the efficiency over Wi-Fi for UDP is the following:
+
+\[ \eta_{UDP_{WiFi}} = \eta_{UDP+IP} * \eta_{WiFi} = \frac{\text{1472}}{\text{1472+20+8}} * 0.822 = \] \[ = 0.981 * 0.822 = 80.6\% \]
+

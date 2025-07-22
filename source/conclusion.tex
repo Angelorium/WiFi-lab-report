@@ -1,0 +1,15 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+In this report was investigated the performance of Ethernet and Wi-Fi connections within Local Area Network (LAN) environments, considering variables such as link capacities and protocol distinctions. The experiments concerned various configurations:
+
+\begin{itemize}
+    \item \textbf{Both Ethernet}: This scenario gave the most promising results, with near-maximum goodput achieved in both directions (around 940 Mbps for TCP and 955 Mbps for UDP). The Ethernet connection is stable and consistent as can be seen from the standard deviations (between 0.3 Mbps to 1 Mbps for TCP and between 1.2 Mbps and 1.4 Mbps for UDP) and low packet loss (approximately 1-1.5\%).
+
+    \item \textbf{Both Wi-Fi}: In contrast to Ethernet, Wi-Fi performance exhibited fluctuations and dropped to an average of 220 Mbps in TCP and 200 Mbps in UDP due to factors like Wi-Fi overhead (control frames are transmitted in lowest speed), half duplex, collision avoidance, retransmissions, electromagnetic noise. Standard deviations were significantly higher (around 20 Mbps for TCP and around 17 Mbps for UDP), indicating less consistent throughput. Packet loss was also more pronounced, reaching up high values (up to 90\%) in some cases.
+
+    \item \textbf{Mixed}: This scenario has performance in the middle between the previous scenarios. Goodput is around 565 Mbps for TCP and 637 Mbps for UDP, more than half of both-ethernet scenario, but packet loss persisted.
+
+\end{itemize}
+In summary, the results show that Ethernet connection allow high performance and stability compared to Wi-Fi. The mixed scenario offers a practical compromise, particularly when some devices require Wi-Fi connectivity due to constraints or location limitations. These findings highlight the importance to adopt new technologies, such as MU-MIMO, to maximize performance.
+Future investigations could focus on exploring more complex network configurations with a larger number of devices or different access point placements.
